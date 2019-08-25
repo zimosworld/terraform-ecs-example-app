@@ -55,3 +55,4 @@ Path: `application`
 - Add ECR for Docker Images
 - Add RDS Instance for Site
 - Add Deployment config for Bitbucket or other 
+- Documentation for how to deploy using CodeDeploy
