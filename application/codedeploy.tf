@@ -73,12 +73,12 @@ resource "aws_codedeploy_deployment_group" "default" {
 
   deployment_style {
     deployment_option = "WITH_TRAFFIC_CONTROL"
-    deployment_type   = "BLUE_GREEN"
+    deployment_type   = var.codedeploy["deployment_type"]
   }
 
   ecs_service {
     cluster_name = aws_ecs_cluster.default.name
-    service_name = aws_ecs_service.default.name
+    service_name = aws_ecs_service.default[var.codedeploy["ecs_service_no"]].name
   }
 
   load_balancer_info {
@@ -118,10 +118,12 @@ variable "codedeploy" {
   description = "Map of codedeploy configs"
   type        = object({
     deployment_config     = string
+    deployment_type       = string
     rollback_events       = list(string)
     timeout_action        = string
     timeout_wait_time     = number
     deploy_success_action = string
     deploy_success_wait   = number
+    ecs_service_no        = number
   })
 }

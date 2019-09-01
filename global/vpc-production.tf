@@ -22,6 +22,8 @@ module "vpc-production" {
   private_subnet_tags  = var.aws_vpc_production["private_subnet_tags"]
   database_subnet_tags = var.aws_vpc_production["database_subnet_tags"]
 
+  enable_dns_hostnames = true
+
   tags = merge({
     terraform   = "true"
   }, var.aws_vpc_production["tags"])

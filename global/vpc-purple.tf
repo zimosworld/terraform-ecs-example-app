@@ -22,6 +22,8 @@ module "vpc-purple" {
   private_subnet_tags  = var.aws_vpc_purple["private_subnet_tags"]
   database_subnet_tags = var.aws_vpc_purple["database_subnet_tags"]
 
+  enable_dns_hostnames = true
+
   tags = merge({
     terraform   = "true"
   }, var.aws_vpc_purple["tags"])

@@ -28,9 +28,27 @@ alb = {
       from_port: 8080,
       to_port: 8080,
       cidr_block: "0.0.0.0/0"
+    },    {
+      from_port: 443,
+      to_port: 443,
+      cidr_block: "0.0.0.0/0"
+    },
+    {
+      from_port: 8443,
+      to_port: 8443,
+      cidr_block: "0.0.0.0/0"
     },
   ]
-  https_listeners = []
+  https_listeners  = [
+    {
+      port: 443,
+      target_group_no: 0
+    },
+    {
+      port: 8443,
+      target_group_no: 1
+    }
+  ]
   http_listeners  = [
     {
       port: 80,
@@ -77,24 +95,73 @@ autoscaling_group = {
 }
 
 #--------------------------------------------------------------
+# Certifcates
+#--------------------------------------------------------------
+
+certificate_domain = "purple-ecs-app.zimosworld.com"
+
+#--------------------------------------------------------------
 # CodeDeploy
 #--------------------------------------------------------------
 
 codedeploy = {
   deployment_config     = "CodeDeployDefault.ECSAllAtOnce"
+  deployment_type       = "BLUE_GREEN"
   rollback_events       = ["DEPLOYMENT_FAILURE"]
   timeout_action        = "STOP_DEPLOYMENT"
   timeout_wait_time     = 1440
   deploy_success_action = "TERMINATE"
   deploy_success_wait   = 1440
+  ecs_service_no        = 0
 }
+
+#--------------------------------------------------------------
+# Database
+#--------------------------------------------------------------
+
+aws_rds = [
+  {
+    storage_type              = "gp2"
+    allocated_storage         = "20"
+    engine                    = "mariadb"
+    engine_version            = "10.3"
+    instance                  = "db.t3.micro"
+    identifier                = "ecs-app-purple"
+    db_name                   = "security"
+    username                  = "master"
+    parameter_group_name      = "default.mariadb10.3"
+    tags                      = {}
+  }
+]
 
 #--------------------------------------------------------------
 # ECS Services
 #--------------------------------------------------------------
 
-ecs_service = {
-  deployment_controller_type  = "CODE_DEPLOY",
-  container_name              = "hello-world",
-  container_port              = 80
-}
+ecs_service = [
+  {
+    task_name                   = "ecs-app-purple"
+    deployment_controller_type  = "CODE_DEPLOY"
+    container_name              = "ecs-app-purple"
+    container_port              = 80
+    desired_count               = 2
+    target_group_no             = 0
+    container_definitions       = <<DEFINITION
+[
+  {
+    "name": "ecs-app-purple-web",
+    "image": "tutum/hello-world",
+    "essential": true,
+    "portMappings": [
+      {
+        "containerPort": 80,
+        "hostPort": 0
+      }
+    ],
+    "memory": 50,
+    "cpu": 10
+  }
+]
+DEFINITION
+  }
+]

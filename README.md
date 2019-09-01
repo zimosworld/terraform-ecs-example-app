@@ -51,8 +51,5 @@ Path: `application`
 ### To Do
 
 - Add logging and S3 Buckets to store logs
-- Add SSL Listeners for ALB
-- Add ECR for Docker Images
-- Add RDS Instance for Site
 - Add Deployment config for Bitbucket or other 
 - Documentation for how to deploy using CodeDeploy

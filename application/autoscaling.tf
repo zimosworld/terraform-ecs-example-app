@@ -4,7 +4,7 @@
 #
 #--------------------------------------------------------------
 
-data "aws_ami" "amazon_linux_ecs" {
+data "aws_ami" "app" {
   most_recent = true
 
   filter {
@@ -31,7 +31,7 @@ resource "aws_security_group" "autoscaling_group" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    security_groups = [aws_security_group.abl_group.id]
+    security_groups = [aws_security_group.alb_group.id]
   }
 
   egress {
@@ -60,7 +60,7 @@ module "autoscaling_group" {
 
   name                        = "${var.tag_application_name}-${var.tag_application_environment}"
   ecs_cluster                 = "${var.tag_application_name}-${var.tag_application_environment}-ecs-cluster"
-  image_id                    = data.aws_ami.amazon_linux_ecs.image_id
+  image_id                    = data.aws_ami.app.image_id
   instance_type               = var.autoscaling_group["launch_config"]["instance_type"]
   key_name                    = var.autoscaling_group["launch_config"]["key_name"]
   instance_security_groups    = [aws_security_group.autoscaling_group.id]
@@ -70,8 +70,9 @@ module "autoscaling_group" {
   health_check_type         = var.autoscaling_group["autoscaling_group"]["health_check_type"]
   desired_capacity          = var.autoscaling_group["autoscaling_group"]["desired_capacity"]
   vpc_zone_identifier       = data.aws_subnet_ids.private_subnets.ids
-  #target_group_arns         = [aws_lb_target_group.green.arn, aws_lb_target_group.blue.arn]
   target_group_arns         = module.alb.target_group_arns
+
+  efs_system_id = aws_efs_file_system.default.id
 
   tags = [
     {

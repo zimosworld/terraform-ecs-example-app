@@ -54,6 +54,40 @@ aws_vpc_purple = {
 }
 
 #--------------------------------------------------------------
+# Certificates
+#--------------------------------------------------------------
+
+certificates = [
+  {
+    domain_name               = "ecs-app.zimosworld.com"
+    subject_alternative_names = []
+    validation_method         = "DNS"
+    application               = "ecs-app"
+    environment               = "production"
+  },
+  {
+    domain_name               = "purple-ecs-app.zimosworld.com"
+    subject_alternative_names = []
+    validation_method         = "DNS"
+    application               = "ecs-app"
+    environment               = "purple"
+  }
+]
+
+#--------------------------------------------------------------
+# Container Registry
+#--------------------------------------------------------------
+
+aws_ecr = [
+  {
+    name = "ecs-app"
+    tags = {
+      application = "ecs-app"
+    }
+  }
+]
+
+#--------------------------------------------------------------
 # SSH Key
 #--------------------------------------------------------------
 

@@ -2,6 +2,14 @@ variable "name" {
   description = "Unique name prefix for resources created in this module."
 }
 
+variable "application_name" {
+  description = ""
+}
+
+variable "application_environment" {
+  description = ""
+}
+
 variable "ecs_cluster" {
   description = ""
   default     = ""
@@ -92,6 +100,10 @@ variable "spot_price" {
 variable "placement_tenancy" {
   description = "The tenancy of the instance. [default, dedicated]"
   default     = "default"
+}
+
+variable "efs_system_id" {
+  description = "The ID that identifies the EFS file system"
 }
 
 #--------------------------------------------------------------

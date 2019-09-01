@@ -70,6 +70,15 @@ variable "tags" {
   default     = {}
 }
 
+variable "log_bucket_name" {
+  description = "The S3 bucket name to store the logs in."
+}
+
+variable "log_location_prefix" {
+  description = "The S3 bucket prefix. Logs are stored in the root if not configured."
+  default     = "alb"
+}
+
 #--------------------------------------------------------------
 # Target Groups
 #--------------------------------------------------------------
@@ -84,6 +93,7 @@ variable "target_groups_defaults" {
   type = object({
     cookie_duration                  = string,
     deregistration_delay             = string,
+    health_check_enabled             = bool,
     health_check_interval            = string,
     health_check_healthy_threshold   = string,
     health_check_path                = string,
@@ -98,6 +108,7 @@ variable "target_groups_defaults" {
   default = {
     cookie_duration                  = 86400
     deregistration_delay             = 300
+    health_check_enabled             = true
     health_check_interval            = 10
     health_check_healthy_threshold   = 3
     health_check_path                = "/"
@@ -116,7 +127,32 @@ variable "target_groups_defaults" {
 #--------------------------------------------------------------
 
 variable "http_tcp_listeners" {
-  description = ""
+  description = "List of HTTP/TCP Listeners"
   type        = "list"
+  default     = []
+}
+
+variable "https_listeners" {
+  description = "List of HTTPS Listeners"
+  type        = "list"
+  default     = []
+}
+
+variable "https_certificate_arn" {
+  description = "Default Certifcate ARN for HTTPS Listeners"
+  default     = ""
+}
+
+variable "listener_ssl_policy_default" {
+  description = "The security policy for HTTPS Listener. https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies"
+  default     = "ELBSecurityPolicy-2016-08"
+}
+
+variable "extra_ssl_certs" {
+  description = "List of extra certificates to add to the HTTPS Listeners."
+  type        = list(object({
+    certificate_arn = string,
+    https_listener_no = number
+  }))
   default     = []
 }
